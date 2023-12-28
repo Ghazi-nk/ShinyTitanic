@@ -28,9 +28,20 @@ ui <- fluidPage(
                   max = 50,
                   value = 30)
     ),
-    
     mainPanel(
-      plotOutput("barChart"), 
+      plotOutput("barChart")
+    )
+  ),
+  
+  sidebarLayout(
+    sidebarPanel(
+      sliderInput("bins2",
+                  "Number of bins:",
+                  min = 1,
+                  max = 50,
+                  value = 30)
+    ),
+    mainPanel(
       plotOutput("pClassChart")
     )
   )
@@ -63,13 +74,13 @@ server <- function(input, output) {
   })
   
   output$pClassChart <- renderPlot({
-    x = titanic_data$Sex
-    survival_rate <- tapply(titanic_data$Survived, x, mean)
+    x = cut(as.numeric(titanic_data$Age), breaks = seq(0, 100, by = input$bins2));
+    survival_rate <- tapply(titanic_data$Survived, x, mean);
     
     ggplot(data.frame(x = names(survival_rate), y = survival_rate), aes(x = x, y = y)) +
       geom_bar(stat = "identity", fill = "steelblue", color = "black") +
       labs(
-        title = "Survival Rate based on Gender",
+        title = "Survival Rate based on Age",
         x = "Gender",
         y = "Survival Rate"
       )
