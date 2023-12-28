@@ -8,6 +8,8 @@
 #    http://shiny.rstudio.com/
 #
 
+install.packages("shiny")
+install.packages("ggplot2")
 library(shiny)
 library(ggplot2)
 
@@ -60,6 +62,7 @@ server <- function(input, output) {
         y = "Survival Rate"
       )
   })
+View(titanic_data)
 }
 # Run the application
 shinyApp(ui = ui, server = server)
