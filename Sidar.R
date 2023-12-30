@@ -101,7 +101,7 @@ server <- function(input, output) {
     chosen <- switch(input$mplot_merkmal, 
                 "PClass" = titanic_data_filtered$Pclass,
                 "Gender" = titanic_data_filtered$Sex,
-                "Age" = titanic_data_filtered$Age)
+                "Age" = cut(as.numeric(titanic_data_filtered$Age), breaks = seq(0, 100, by = 30)))
     survival <- titanic_data_filtered$Survived
     
     table_data <- data.frame(chosen, survival)
