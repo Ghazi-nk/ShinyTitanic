@@ -49,7 +49,7 @@ ui <- fluidPage(
   sidebarLayout(
     sidebarPanel(
       selectInput("mplot_merkmal", "Wähle ein Merkmal zum Vergleich:",
-                  choices = c("PClass", "Gender", "Age"))
+                  choices = c("PClass", "Gender", "Age")),
     ),
     mainPanel(
       plotOutput("mplotOutput")
@@ -64,7 +64,7 @@ server <- function(input, output) {
   output$barChart <- renderPlot({
     # Choose the variable based on user input
     x_var <- switch(input$variable,
-                    "Age" = cut(as.numeric(titanic_data$Age), breaks = seq(0, 100, by = input$bins)),
+                    "Age" = cut(as.numeric(titanic_data$Age), breaks = seq(0, 51, by = input$bins)),
                     "Pclass" = as.factor(titanic_data$Pclass))
     
     # Filter out missing values
@@ -98,10 +98,11 @@ server <- function(input, output) {
   
   output$mplotOutput <- renderPlot({
     titanic_data_filtered <- na.omit(titanic_data)
+    breaks_age <- c(0, 18, 30, 60, 100)
     chosen <- switch(input$mplot_merkmal, 
                 "PClass" = titanic_data_filtered$Pclass,
                 "Gender" = titanic_data_filtered$Sex,
-                "Age" = cut(as.numeric(titanic_data_filtered$Age), breaks = seq(0, 100, by = 30)))
+                "Age" = cut(as.numeric(titanic_data_filtered$Age), breaks = breaks_age))
     survival <- titanic_data_filtered$Survived
     
     table_data <- data.frame(chosen, survival)

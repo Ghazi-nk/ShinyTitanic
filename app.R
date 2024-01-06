@@ -34,6 +34,16 @@ ui <- fluidPage(
     mainPanel(
       plotOutput("barChart")
     )
+  ),
+  
+  sidebarLayout(
+    sidebarPanel(
+      selectInput("mplot_merkmal", "Wähle ein Merkmal zum Vergleich:",
+                  choices = c("PClass", "Gender", "Age")),
+    ),
+    mainPanel(
+      plotOutput("mplotOutput")
+    )
   )
 )
 
@@ -61,6 +71,22 @@ server <- function(input, output) {
         x = input$variable,
         y = "Survival Rate"
       )
+  })
+  
+  output$mplotOutput <- renderPlot({
+    titanic_data_filtered <- na.omit(titanic_data)
+    breaks_age <- c(0, 18, 30, 60, 100)
+    chosen <- switch(input$mplot_merkmal, 
+                     "PClass" = titanic_data_filtered$Pclass,
+                     "Gender" = titanic_data_filtered$Sex,
+                     "Age" = cut(as.numeric(titanic_data_filtered$Age), breaks = breaks_age))
+    survival <- titanic_data_filtered$Survived
+    
+    table_data <- data.frame(chosen, survival)
+    colnames(table_data) <- c(input$mplot_merkmal, "Survived")
+    mosaic_data <- table(table_data)
+    
+    mosaicplot(mosaic_data, labs(title = "Mosaikplot"))
   })
 View(titanic_data)
 }
