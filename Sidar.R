@@ -50,16 +50,21 @@ ui <- fluidPage(
     sidebarPanel(
       selectInput("mplot_merkmal", "Wähle ein Merkmal zum Vergleich:",
                   choices = c("PClass", "Gender", "Age", "Fare")),
-      selectInput("mplot_intervall", "Wähle ein Intervall:",
-                  choices = c("Alle Passagiere",
-                              "Passagiere bis zu 20 Jahren",
-                              "Passagiere zwischen 20 - 40 Jahren",
-                              "Passagiere zwischen 40 - 60 Jahren",
-                              "Passagiere zwischen 60 - 85 Jahren")),
-      selectInput("mplotfare_intervall", "Wähle ein Intervall für Fare:",
-                  choices = c("Alle Passagiere",
-                              "Tickets zwischen 100 - 200 GE",
-                              "Tickets zwischen 200 - 550 GE"))
+      
+      conditionalPanel(
+        condition = "input.mplot_merkmal == 'Age'",
+        selectInput("mplot_intervall", "Wähle ein Intervall für Age:",
+                    choices = c("Alle Passagiere",
+                                "Passagiere bis zu 20 Jahren",
+                                "Passagiere zwischen 20 - 40 Jahren",
+                                "Passagiere zwischen 40 - 60 Jahren",
+                                "Passagiere zwischen 60 - 85 Jahren"))),
+      conditionalPanel(
+        condition = "input.mplot_merkmal == 'Fare'",
+        selectInput("mplotfare_intervall", "Wähle ein Intervall für Fare:",
+                    choices = c("Alle Passagiere",
+                                "Tickets zwischen 100 - 200 GE",
+                                "Tickets zwischen 200 - 550 GE")))
     ),
     mainPanel(
       plotOutput("mplotOutput")
