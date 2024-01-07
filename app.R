@@ -39,7 +39,17 @@ ui <- fluidPage(
   sidebarLayout(
     sidebarPanel(
       selectInput("mplot_merkmal", "Wähle ein Merkmal zum Vergleich:",
-                  choices = c("PClass", "Gender", "Age")),
+                  choices = c("PClass", "Gender", "Age", "Fare")),
+      selectInput("mplot_intervall", "Wähle ein Intervall:",
+                  choices = c("Alle Passagiere",
+                              "Passagiere bis zu 20 Jahren",
+                              "Passagiere zwischen 20 - 40 Jahren",
+                              "Passagiere zwischen 40 - 60 Jahren",
+                              "Passagiere zwischen 60 - 85 Jahren")),
+      selectInput("mplotfare_intervall", "Wähle ein Intervall für Fare:",
+                  choices = c("Alle Passagiere",
+                              "Tickets zwischen 100 - 200 GE",
+                              "Tickets zwischen 200 - 550 GE"))
     ),
     mainPanel(
       plotOutput("mplotOutput")
@@ -75,11 +85,22 @@ server <- function(input, output) {
   
   output$mplotOutput <- renderPlot({
     titanic_data_filtered <- na.omit(titanic_data)
-    breaks_age <- c(0, 18, 30, 60, 100)
+    breaks <- switch(input$mplot_intervall,
+                     "Alle Passagiere" = c(0, 18, 30, 60, 100),
+                     "Passagiere bis zu 20 Jahren" = c(0, 5, 10, 15, 20),
+                     "Passagiere zwischen 20 - 40 Jahren" = c(20, 25, 30, 35, 40),
+                     "Passagiere zwischen 40 - 60 Jahren" = c(40, 45, 50, 55, 60),
+                     "Passagiere zwischen 60 - 85 Jahren" = c(60, 65, 70, 85))
+    breaks_fare <- switch(input$mplotfare_intervall,
+                          "Alle Passagiere" = c(0, 25, 50, 100, 550),
+                          "Tickets zwischen 100 - 200 GE" = c(100, 125, 150, 200),
+                          "Tickets zwischen 200 - 550 GE" = c(200, 230, 270, 550))
     chosen <- switch(input$mplot_merkmal, 
                      "PClass" = titanic_data_filtered$Pclass,
                      "Gender" = titanic_data_filtered$Sex,
-                     "Age" = cut(as.numeric(titanic_data_filtered$Age), breaks = breaks_age))
+                     "Age" = cut(as.numeric(titanic_data_filtered$Age), breaks = breaks),
+                     "Fare" = cut(as.numeric(titanic_data_filtered$Fare), breaks = breaks_fare))
+    
     survival <- titanic_data_filtered$Survived
     
     table_data <- data.frame(chosen, survival)
