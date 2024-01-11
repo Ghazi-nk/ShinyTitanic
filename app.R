@@ -19,6 +19,21 @@ titanic_data <- read.csv2("titanic_data.csv", header = TRUE, sep= ",")
 # Define UI for the application
 ui <- fluidPage(
   titlePanel("Titanic Survival Analysis"),
+
+  sidebarLayout(
+    sidebarPanel(
+      h2("Titanic Survival Analysis"),
+      h4("Bitte wähle die zu überprüfenden Daten aus."),
+      selectInput("sex", "Geschlecht:", c("male", "female")),
+      sliderInput("alter", "Alter:", 1, 90, value = 25, step = 1),
+      selectInput("hafen", "An diesem Hafen zugestiegen:", c("Cherbourg" = 'C', "Queenstown" = 'Q', "Southhampton" = 'S')),
+      numericInput("klasse", "Ticketklasse:", value = 3, min = 1, max = 3, step = 1)
+    ),
+    
+    mainPanel(
+      h2(textOutput("prob")),
+    )
+  ),
   
   sidebarLayout(
     sidebarPanel(
@@ -81,6 +96,34 @@ ui <- fluidPage(
 
 # Define server logic
 server <- function(input, output) {
+  # Logik für Überlebenschance-Vorhersage:
+  output$prob <- renderText({
+    titanic_data_filtered <- select(titanic_data, -c(PassengerId, Name, Ticket, Cabin, SibSp, Parch, Fare))
+    
+    titanic_data_filtered <- titanic_data_filtered %>%
+      as_tibble() %>%
+      mutate(
+        Survived = factor(Survived),
+        Pclass = factor(Pclass),
+        Age = factor(Age),
+        Sex = factor(Sex),
+        Embarked = factor(Embarked)
+      ) %>%
+      filter(!is.na(Survived), !is.na(Pclass), !is.na(Age))
+    
+    prediction_model <- glm(formula=Survived ~. , family = binomial(link = "logit"), data = titanic_data_filtered)
+    
+    prediction_input_data <- data.frame(
+      Sex = as.factor(input$sex),
+      Age = as.factor(as.character(input$alter)),
+      Embarked = as.factor(input$hafen),
+      Pclass = as.factor(as.character(input$klasse))
+    )
+    
+    prob <- predict(prediction_model, newdata = prediction_input_data, type = "response")
+    
+    paste(round(as.numeric(as.character(prob))*100, 2), "%")
+  })
   
   
   output$barChart <- renderPlot({
