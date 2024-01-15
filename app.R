@@ -7,7 +7,6 @@
 #
 #    http://shiny.rstudio.com/
 #
-
 library(shiny)
 library(ggplot2)
 library(dplyr)
@@ -126,27 +125,6 @@ server <- function(input, output) {
   })
   
   
-  output$barChart <- renderPlot({
-    # Choose the variable based on user input
-    x_var <- switch(input$variable,
-                    "Age" = cut(as.numeric(titanic_data$Age), breaks = seq(0, 100, by = input$bins)),
-                    "Pclass" = as.factor(titanic_data$Pclass))
-    
-    # Filter out missing values
-    titanic_data_filtered <- na.omit(titanic_data)
-    
-    # Calculate survival rate
-    survival_rate <- tapply(titanic_data_filtered$Survived, x_var, mean)
-    
-    # Create a bar chart
-    ggplot(data.frame(x = names(survival_rate), y = survival_rate), aes(x = x, y = y)) +
-      geom_bar(stat = "identity", fill = "steelblue", color = "black") +
-      labs(
-        title = "Survival Analysis",
-        x = input$variable,
-        y = "Survival Rate"
-      )
-  })
   
   output$mplotOutput <- renderPlot({
     titanic_data_filtered <- na.omit(titanic_data)
