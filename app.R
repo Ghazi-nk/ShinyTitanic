@@ -22,15 +22,16 @@ ui <- fluidPage(
   sidebarLayout(
     sidebarPanel(
       h2("Titanic Survival Analysis"),
-      h4("Bitte wähle die zu überprüfenden Daten aus."),
+      h4("Bitte wähle die Daten für die Berechnung der Überlebenswahrscheinlichkeit aus."),
       selectInput("sex", "Geschlecht:", c("male", "female")),
-      sliderInput("alter", "Alter:", 1, 90, value = 25, step = 1),
+      sliderInput("alter", "Alter:", 1, 60, value = 25, step = 1),
       selectInput("hafen", "An diesem Hafen zugestiegen:", c("Cherbourg" = 'C', "Queenstown" = 'Q', "Southhampton" = 'S')),
       numericInput("klasse", "Ticketklasse:", value = 3, min = 1, max = 3, step = 1)
     ),
     
     mainPanel(
       h2(textOutput("prob")),
+      h4("Inspiration von: https://github.com/Eamoned/Titanic-Survival-Predictor-ShinyApp")
     )
   ),
   
