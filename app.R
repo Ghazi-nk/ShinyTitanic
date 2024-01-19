@@ -21,7 +21,7 @@ ui <- fluidPage(
 
   sidebarLayout(
     sidebarPanel(
-      h2("Titanic Survival Analysis"),
+      h2("Vorhersage der Überlebenswahrscheinlichkeit"),
       h4("Bitte wähle die Daten für die Berechnung der Überlebenswahrscheinlichkeit aus."),
       selectInput("sex", "Geschlecht:", c("male", "female")),
       sliderInput("alter", "Alter:", 1, 60, value = 25, step = 1),
@@ -37,6 +37,7 @@ ui <- fluidPage(
   
   sidebarLayout(
     sidebarPanel(
+      h2("Ausführliches Histogramm"),
       checkboxInput("pclass_toggle", "Gesamt Übersicht", value = FALSE),
       conditionalPanel(
         condition = "input.pclass_toggle == false",
@@ -70,6 +71,7 @@ ui <- fluidPage(
   
   sidebarLayout(
     sidebarPanel(
+      hw("Ausführlicher Mosaikplot"),
       selectInput("mplot_merkmal", "Wähle ein Merkmal zum Vergleich:",
                   choices = c("PClass", "Gender", "Age", "Fare")),
       
