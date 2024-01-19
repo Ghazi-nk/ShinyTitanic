@@ -71,7 +71,7 @@ ui <- fluidPage(
   
   sidebarLayout(
     sidebarPanel(
-      hw("Ausführlicher Mosaikplot"),
+      h2("Ausführlicher Mosaikplot"),
       selectInput("mplot_merkmal", "Wähle ein Merkmal zum Vergleich:",
                   choices = c("PClass", "Gender", "Age", "Fare")),
       
