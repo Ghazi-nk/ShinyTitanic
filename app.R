@@ -52,22 +52,6 @@ ui <- fluidPage(
       plotOutput("survival_histogram")
     )
   ),
-
-  sidebarLayout(
-    sidebarPanel(
-      selectInput("variable", "Choose a variable:",
-                  choices = c("Age", "Pclass")),
-      sliderInput("bins",
-                  "Number of bins:",
-                  min = 1,
-                  max = 50,
-                  value = 30)
-    ),
-    
-    mainPanel(
-      plotOutput("barChart")
-    )
-  ),
   
   sidebarLayout(
     sidebarPanel(
