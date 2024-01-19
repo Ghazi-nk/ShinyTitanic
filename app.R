@@ -70,7 +70,7 @@ ui <- fluidPage(
       conditionalPanel(
         condition = "input.mplot_merkmal == 'Fare'",
         selectInput("mplotfare_intervall", "Wähle ein Intervall für Fare:",
-                    choices = c("Alle Passagiere",
+                    choices = c("Tickets aller Passagiere",
                                 "Tickets zwischen 100 - 200 GE",
                                 "Tickets zwischen 200 - 550 GE")))
     ),
@@ -122,7 +122,7 @@ server <- function(input, output) {
                      "Passagiere zwischen 40 - 60 Jahren" = c(40, 45, 50, 55, 60),
                      "Passagiere zwischen 60 - 85 Jahren" = c(60, 65, 70, 85))
     breaks_fare <- switch(input$mplotfare_intervall,
-                          "Alle Passagiere" = c(0, 25, 50, 100, 550),
+                          "Tickets aller Passagiere" = c(0, 25, 50, 100, 550),
                           "Tickets zwischen 100 - 200 GE" = c(100, 125, 150, 200),
                           "Tickets zwischen 200 - 550 GE" = c(200, 230, 270, 550))
     chosen <- switch(input$mplot_merkmal, 
