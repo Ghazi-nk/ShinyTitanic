@@ -11,27 +11,46 @@ library(shiny)
 library(ggplot2)
 library(dplyr)
 library(palmerpenguins)
+library(mice)
 
 titanic_data <- read.csv2("titanic_data.csv", header = TRUE, sep= ",")
-# This assumes you have a CSV file named "titanic_data.csv" with the provided data.
+
+int_columns <- c("Survived", "Age", "Pclass")
+int_data <- titanic_data[int_columns]
+int_data$Age <- as.numeric(int_data$Age)
+full_Age <- mice::complete(mice(int_data, method = "cart"))$Age
+titanic_data$Age <- as.character(full_Age)
+
+# format data for prediction
+titanic_data_filtered <- select(titanic_data, -c(PassengerId, Name, Ticket, Cabin, SibSp, Parch, Fare))
+
+titanic_data_filtered <- titanic_data_filtered %>%
+  as_tibble() %>%
+  mutate(
+    Survived = factor(Survived),
+    Pclass = factor(Pclass),
+    Age = factor(Age),
+    Sex = factor(Sex),
+    Embarked = factor(Embarked)
+  ) %>%
+  filter(!is.na(Survived), !is.na(Pclass), !is.na(Age))
 
 # Define UI for the application
 ui <- fluidPage(
   titlePanel("Titanic Survival Analysis"),
-
+  
   sidebarLayout(
     sidebarPanel(
       h2("Vorhersage der Überlebenswahrscheinlichkeit"),
       h4("Bitte wähle die Daten für die Berechnung der Überlebenswahrscheinlichkeit aus."),
       selectInput("sex", "Geschlecht:", c("male", "female")),
-      sliderInput("alter", "Alter:", 1, 60, value = 25, step = 1),
+      sliderInput("alter", "Alter:", 1, 58, value = 25, step = 1),
       selectInput("hafen", "An diesem Hafen zugestiegen:", c("Cherbourg" = 'C', "Queenstown" = 'Q', "Southhampton" = 'S')),
       numericInput("klasse", "Ticketklasse:", value = 3, min = 1, max = 3, step = 1)
     ),
     
     mainPanel(
-      h2(textOutput("prob")),
-      h4("Inspiration von: https://github.com/Eamoned/Titanic-Survival-Predictor-ShinyApp")
+      h2(textOutput("prob"))
     )
   ),
   
@@ -77,28 +96,29 @@ ui <- fluidPage(
     mainPanel(
       plotOutput("mplotOutput")
     )
-  )
+  ),
+  
+  sidebarLayout(
+    sidebarPanel(
+      h2("Ausgabe des Datensatzes")
+    ),
+    
+    mainPanel(
+      tableOutput("tableView")
+    )
+  ),
 )
 
 # Define server logic
 server <- function(input, output) {
+  # Tabellenausgabe
+  output$tableView <- renderTable(
+    titanic_data_filtered
+  )
+  
   # Logik für Überlebenschance-Vorhersage:
   output$prob <- renderText({
-    titanic_data_filtered <- select(titanic_data, -c(PassengerId, Name, Ticket, Cabin, SibSp, Parch, Fare))
-    
-    titanic_data_filtered <- titanic_data_filtered %>%
-      as_tibble() %>%
-      mutate(
-        Survived = factor(Survived),
-        Pclass = factor(Pclass),
-        Age = factor(Age),
-        Sex = factor(Sex),
-        Embarked = factor(Embarked)
-      ) %>%
-      filter(!is.na(Survived), !is.na(Pclass), !is.na(Age))
-    
     prediction_model <- glm(formula=Survived ~. , family = binomial(link = "logit"), data = titanic_data_filtered)
-    
     prediction_input_data <- data.frame(
       Sex = as.factor(input$sex),
       Age = as.factor(as.character(input$alter)),
