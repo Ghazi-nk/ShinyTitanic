@@ -1,0 +1,13 @@
+name: ShinyTitanic
+title: ShinyTitanic
+username: ghazinakkash
+account: ghazinakkash
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 10932039
+bundleId: 8167325
+url: https://ghazinakkash.shinyapps.io/ShinyTitanic/
+version: 1
+asMultiple: FALSE
+asStatic: FALSE
+ignoredFiles: Friedrich.R|Ghazi.html|Ghazi.R|renv.lock|Sidar.R

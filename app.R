@@ -12,8 +12,12 @@ library(ggplot2)
 library(dplyr)
 library(palmerpenguins)
 library(mice)
+library(DT)
 
 titanic_data <- read.csv2("titanic_data.csv", header = TRUE, sep= ",")
+
+
+
 
 int_columns <- c("Survived", "Age", "Pclass")
 int_data <- titanic_data[int_columns]
@@ -39,6 +43,8 @@ titanic_data_filtered <- titanic_data_filtered %>%
 ui <- fluidPage(
   titlePanel("Titanic Survival Analysis"),
   
+  tabsetPanel(
+    tabPanel("Titanic App",
   sidebarLayout(
     sidebarPanel(
       h2("Vorhersage der Überlebenswahrscheinlichkeit"),
@@ -71,7 +77,7 @@ ui <- fluidPage(
       plotOutput("survival_histogram")
     )
   ),
-  
+           
   sidebarLayout(
     sidebarPanel(
       h2("Ausführlicher Mosaikplot"),
@@ -97,23 +103,20 @@ ui <- fluidPage(
       plotOutput("mplotOutput")
     )
   ),
-  
-  sidebarLayout(
-    sidebarPanel(
-      h2("Ausgabe des Datensatzes")
     ),
-    
-    mainPanel(
-      tableOutput("tableView")
-    )
+  tabPanel("Daten",
+           dataTableOutput("tableView")
   ),
 )
+)
+
 
 # Define server logic
 server <- function(input, output) {
   # Tabellenausgabe
-  output$tableView <- renderTable(
-    titanic_data_filtered
+  output$tableView <- renderDT(
+    titanic_data, options = list(lengthChange = FALSE)
+    
   )
   
   # Logik für Überlebenschance-Vorhersage:
@@ -173,7 +176,7 @@ server <- function(input, output) {
         ggplot(survival_probabilities, aes(x = as.factor(Age_Group), y = Survival_Probability, fill = as.factor(Pclass))) +
           geom_bar(stat = "identity", position = "dodge", color = "black") +
           labs(title = "Überlebenswahrscheinlichkeit nach Altersgruppen und Passagiere Klasse",
-               x = "Altersgruppen", y = "Absolute Anzahl der Passagiere",
+               x = "Altersgruppen", y = "Überlebenswahrscheinlichkeit",
                fill = "Passagier Klasse") +  # Hier wird die Legendenbeschriftung hinzugefügt
           scale_x_discrete(na.translate = FALSE) +
           theme_minimal() +
